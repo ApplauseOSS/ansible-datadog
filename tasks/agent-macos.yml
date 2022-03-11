@@ -84,14 +84,6 @@
   shell: "dscacheutil -q user -a name {{ ansible_user }} | grep -w uid | awk '{print $2}'"
   register: macos_user_id
 
-- name: Load com.datadoghq.agent.plist
-  command: "launchctl bootstrap gui/{{ macos_user_id.stdout }} {{ datadog_macos_plist_file }}"
-  register: command_result
-  changed_when: "'service already loaded' not in command_result.stderr"
-  failed_when: "'service already loaded' not in command_result.stderr"
-  check_mode: no
-  when: not datadog_skip_running_check and datadog_enabled and not ansible_check_mode
-
 - name: Unload com.datadoghq.agent.plist
   command: "launchctl bootout gui/{{ macos_user_id.stdout }} {{ datadog_macos_plist_file }}"
   when: not datadog_skip_running_check and datadog_enabled
